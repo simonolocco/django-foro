@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Comments - File Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        terminal: {
+                            bg: '#0a0a0a',
+                            card: '#1a1a1a',
+                            border: '#dc2626',
+                            text: '#f8fafc',
+                            accent: '#dc2626',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen text-white font-sans" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
+
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <a href="{% url 'landing' %}" class="inline-flex items-center text-red-500 hover:text-red-400 transition-colors duration-200 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Back to Marketplace
+            </a>
+            
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-8 h-8 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white">All Comments</h1>
+            </div>
+            <p class="text-gray-400">Recent comments from the community</p>
+        </div>
+
+        <!-- Comments Grid -->
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {% for comment in comments %}
+                <div class="bg-gray-900 p-6 border border-gray-700 hover:border-red-500 transition-all duration-300" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);">
+                    <!-- File Info -->
+                    <div class="mb-4">
+                        <h3 class="text-red-500 font-semibold text-lg mb-2">
+                            <a href="{% url 'file_detail' comment.file.id %}" class="hover:text-red-400 transition-colors duration-200">
+                                {{ comment.file.title|truncatechars:40 }}
+                            </a>
+                        </h3>
+                        <p class="text-gray-400 text-sm">by {{ comment.file.uploader.username }}</p>
+                    </div>
+                    
+                    <!-- Comment -->
+                    <div class="border-l-2 border-gray-700 pl-4 mb-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-red-500 font-medium text-sm">{{ comment.user.username }}</span>
+                            {% if comment.user == comment.file.uploader %}
+                                <span class="bg-red-600 text-white text-xs px-2 py-1 font-medium">SELLER</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-300 text-sm mb-2">{{ comment.content|truncatechars:100 }}</p>
+                        <span class="text-gray-400 text-xs">{{ comment.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center">
+                        <a href="{% url 'file_comments' comment.file.id %}" class="text-red-500 hover:text-red-400 text-sm transition-colors duration-200">
+                            View all comments
+                        </a>
+                        {% if comment.replies.count > 0 %}
+                            <span class="text-gray-400 text-xs">{{ comment.replies.count }} repl{{ comment.replies.count|pluralize:"y,ies" }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <div class="text-gray-500 text-6xl mb-4">💬</div>
+                    <p class="text-gray-400">No comments yet. Start the conversation!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+            <div class="mt-8 flex justify-center">
+                <nav class="flex space-x-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white transition-colors duration-200">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white transition-colors duration-200">Previous</a>
+                    {% endif %}
+                    
+                    <span class="px-3 py-2 bg-red-600 text-white">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white transition-colors duration-200">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white transition-colors duration-200">Last</a>
+                    {% endif %}
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+
+    <style>
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        }
+        
+        * {
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+        }
+        
+        ::selection {
+            background: #dc2626;
+            color: #fff;
+        }
+        
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid #dc2626;
+            outline-offset: 2px;
+        }
+    </style>
+
+</body>
+</html>

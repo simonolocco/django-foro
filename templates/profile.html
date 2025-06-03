@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user_profile.username }} Profile - Professional File Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        terminal: {
+                            bg: '#0a0a0a',
+                            card: '#1a1a1a',
+                            border: '#dc2626',
+                            text: '#f8fafc',
+                            accent: '#dc2626',
+                            muted: '#94a3b8'
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen text-white font-sans" style="background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);">
+
+    <!-- Professional Header -->
+    <header class="border-b border-gray-700 backdrop-blur-sm" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%); border-bottom: 1px solid #374151;">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <!-- Logo and Title -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-xl font-mono font-bold">M</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-sans font-bold text-white">File Marketplace</h1>
+                        <p class="text-gray-400 text-sm font-sans">{{ user_profile.username }}'s Profile</p>
+                    </div>
+                </div>
+                
+                <!-- User Status -->
+                {% if user.is_authenticated %}
+                    <div class="text-right">
+                        <p class="text-red-500 font-medium">Welcome, {{ user.username }}</p>
+                        <p class="text-gray-400 text-sm">Professional Member</p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Professional Navigation -->
+            <nav class="border-t border-gray-700 pt-4">
+                <ul class="flex flex-wrap items-center gap-6">
+                    <li>
+                        <a href="{% url 'landing' %}" class="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 hover:text-white hover:border-red-500 transition-all duration-300">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'brand_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 hover:text-white hover:border-red-500 transition-all duration-300">
+                            Brands
+                        </a>
+                    </li>
+                    {% if user.is_authenticated and user.username == user_profile.username %}
+                        <li>
+                            <a href="{% url 'upload' %}" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium transition-all duration-300 transform hover:scale-105" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                                <span class="mr-2">+</span> Upload File
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}" class="inline-flex items-center px-4 py-2 text-gray-400 hover:text-red-400 transition-colors duration-300">
+                                Sign Out
+                            </a>
+                        </li>
+                    {% elif user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'user_profile' user.username %}" class="inline-flex items-center px-4 py-2 border border-gray-600 text-gray-300 hover:text-white hover:border-red-500 transition-all duration-300">
+                                My Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'logout' %}" class="inline-flex items-center px-4 py-2 text-gray-400 hover:text-red-400 transition-colors duration-300">
+                                Sign Out
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a href="{% url 'login' %}" class="inline-flex items-center px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium transition-all duration-300 transform hover:scale-105" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                                Sign In
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'register' %}" class="inline-flex items-center px-4 py-2 border border-red-600 text-red-500 hover:bg-red-600 hover:text-white transition-all duration-300">
+                                Create Account
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8 space-y-12">
+
+        <!-- Profile Header -->
+        <section class="bg-gray-900 p-8 border border-red-600 shadow-2xl" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%); border-color: #dc2626; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.25);">
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-2xl font-mono font-bold">{{ user_profile.username|first|upper }}</span>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-sans font-semibold text-white">{{ user_profile.username }}</h2>
+                        <p class="text-gray-400 font-sans">Professional Creator</p>
+                        <div class="w-20 h-px bg-red-600 mt-2"></div>
+                    </div>
+                </div>
+                {% if user.is_authenticated and user.username == user_profile.username %}
+                    <span class="bg-red-600 bg-opacity-20 text-red-400 px-3 py-1 font-sans text-sm">YOUR PROFILE</span>
+                {% endif %}
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-black bg-opacity-30 p-6 border-l-4 border-red-600">
+                    <h3 class="text-red-500 font-sans font-medium mb-2">Username</h3>
+                    <p class="text-white font-sans text-xl font-semibold">{{ user_profile.username }}</p>
+                </div>
+                <div class="bg-black bg-opacity-30 p-6 border-l-4 border-red-600">
+                    <h3 class="text-red-500 font-sans font-medium mb-2">Files Uploaded</h3>
+                    <p class="text-white font-sans text-xl font-semibold">{{ files|length }}</p>
+                </div>
+                <div class="bg-black bg-opacity-30 p-6 border-l-4 border-red-600">
+                    <h3 class="text-red-500 font-sans font-medium mb-2">Total Sales</h3>
+                    <p class="text-white font-sans text-xl font-semibold">
+                        {% if best_seller_files %}
+                            {{ best_seller_files|length }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Best Selling Files -->
+        {% if best_seller_files %}
+        <section class="bg-gray-900 p-8 border border-red-600 shadow-2xl" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%); border-color: #dc2626; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.25);">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-sm font-mono">🔥</span>
+                    </div>
+                    <h2 class="text-2xl font-sans font-semibold text-white">Best Sellers</h2>
+                </div>
+                <p class="text-gray-400 font-sans mb-4">Top performing files by sales</p>
+                <div class="w-20 h-px bg-red-600"></div>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {% for file in best_seller_files %}
+                    <div class="bg-black bg-opacity-30 border border-gray-700 p-6 hover:border-red-500 transition-all duration-300 transform hover:scale-105" style="background: rgba(0, 0, 0, 0.3);">
+                        <h3 class="text-red-500 font-sans font-semibold text-lg mb-3">{{ file.title }}</h3>
+                        <p class="text-gray-300 text-sm mb-4 leading-relaxed">{{ file.description|truncatewords:15 }}</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-sm">Sales:</span>
+                                <span class="text-red-500 font-medium">{{ file.total_sales }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-sm">Price:</span>
+                                <span class="text-red-500 font-medium">{{ file.price }} coins</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'file_detail' file.id %}" class="inline-block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 transition-all duration-300" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                            View Details
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- All Uploaded Files -->
+        <section class="bg-gray-900 p-8 border border-red-600 shadow-2xl" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%); border-color: #dc2626; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.25);">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-sm font-mono">📁</span>
+                    </div>
+                    <h2 class="text-2xl font-sans font-semibold text-white">All Files</h2>
+                </div>
+                <p class="text-gray-400 font-sans mb-4">Complete portfolio of uploaded content</p>
+                <div class="w-20 h-px bg-red-600"></div>
+            </div>
+            
+            {% if files %}
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {% for file in files %}
+                    <div class="bg-black bg-opacity-30 border border-gray-700 p-6 hover:border-red-500 transition-all duration-300 transform hover:scale-105" style="background: rgba(0, 0, 0, 0.3);">
+                        <h3 class="text-red-500 font-sans font-semibold text-lg mb-3">{{ file.title }}</h3>
+                        <p class="text-gray-300 text-sm mb-4 leading-relaxed">{{ file.description|truncatewords:15 }}</p>
+                        
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-sm">Price:</span>
+                                <span class="text-red-500 font-medium">{{ file.price }} coins</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-sm">Downloads:</span>
+                                <span class="text-red-500 font-medium">{{ file.downloads }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-400 text-sm">Uploaded:</span>
+                                <span class="text-gray-400 text-sm">{{ file.created_at|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        <a href="{% url 'file_detail' file.id %}" class="inline-block w-full text-center bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 transition-all duration-300" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                            View Details
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="text-gray-500 text-6xl mb-4">📂</div>
+                    <p class="text-gray-400 font-sans text-xl mb-2">No files uploaded yet</p>
+                    <p class="text-gray-400 font-sans mb-6">This user hasn't shared any content</p>
+                    {% if user.is_authenticated and user.username == user_profile.username %}
+                        <a href="{% url 'upload' %}" class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 transition-all duration-300 transform hover:scale-105" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);">
+                            <span class="mr-2">+</span> Upload Your First File
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Personal Statistics (Only for own profile) -->
+        {% if user.is_authenticated and user.username == user_profile.username %}
+        <section class="bg-gray-900 p-8 border border-red-600 shadow-2xl" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%); border-color: #dc2626; box-shadow: 0 25px 50px -12px rgba(220, 38, 38, 0.25);">
+            <div class="mb-8">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-sm font-mono">📊</span>
+                    </div>
+                    <h2 class="text-2xl font-sans font-semibold text-white">Your Statistics</h2>
+                </div>
+                <p class="text-gray-400 font-sans mb-4">Personal performance metrics</p>
+                <div class="w-20 h-px bg-red-600"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="text-center bg-black bg-opacity-30 border border-gray-700 p-6">
+                    <div class="text-red-500 text-3xl font-bold mb-2">{{ files|length }}</div>
+                    <p class="text-gray-400 font-sans text-sm">Files Uploaded</p>
+                </div>
+                <div class="text-center bg-black bg-opacity-30 border border-gray-700 p-6">
+                    <div class="text-red-500 text-3xl font-bold mb-2">
+                        {% if files %}
+                            {% for file in files %}{{ file.downloads }}{% if not forloop.last %}+{% endif %}{% endfor %}
+                        {% else %}
+                            0   
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-400 font-sans text-sm">Total Downloads</p>
+                </div>
+                <div class="text-center bg-black bg-opacity-30 border border-gray-700 p-6">
+                    <div class="text-red-500 text-3xl font-bold mb-2">
+                        {% if best_seller_files %}
+                            {{ best_seller_files|length }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </div>
+                    <p class="text-gray-400 font-sans text-sm">Files Sold</p>
+                </div>
+                <div class="text-center bg-black bg-opacity-30 border border-gray-700 p-6">
+                    <div class="text-red-500 text-3xl font-bold mb-2">{{ user_profile.date_joined|date:"Y" }}</div>
+                    <p class="text-gray-400 font-sans text-sm">Member Since</p>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="border-t border-gray-700 mt-16" style="background: linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%);">
+        <div class="max-w-7xl mx-auto px-6 py-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-red-600 bg-opacity-10 border border-red-600 flex items-center justify-center">
+                        <span class="text-red-500 text-sm font-mono">M</span>
+                    </div>
+                    <span class="text-white font-sans font-medium">File Marketplace</span>
+                </div>
+                <p class="text-gray-400 text-sm font-sans">&copy; 2025 Professional File Marketplace. All rights reserved.</p>
+                <p class="text-gray-500 text-xs font-sans mt-2">Enterprise-grade digital asset platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Professional styling */
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        /* Professional scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+        }
+        
+        /* Smooth animations */
+        * {
+            transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+        }
+        
+        /* Professional selection styling */
+        ::selection {
+            background: #dc2626;
+            color: #fff;
+        }
+        
+        /* Focus states for accessibility */
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid #dc2626;
+            outline-offset: 2px;
+        }
+    </style>
+
+</body>
+</html>
